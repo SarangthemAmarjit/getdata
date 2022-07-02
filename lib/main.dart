@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:getpostapp/jsonplaceholder.dart';
-import 'package:getpostapp/modal.dart';
 import 'package:getpostapp/newmodel.dart';
-import 'package:http/http.dart' as http;
+import 'package:getpostapp/serviceapi.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'GetPost',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: GetPostApp(),
+      home: const GetPostApp(),
     );
   }
 }
@@ -32,56 +28,63 @@ class GetPostApp extends StatefulWidget {
 }
 
 class _GetPostAppState extends State<GetPostApp> {
-  List<JsonPlaceHolder> newlist = [];
-  Future<List<JsonPlaceHolder>> fetchData() async {
-    var url = 'https://jsonplaceholder.typicode.com/albums';
-    var response = await http.get(Uri.parse(url));
-
-    List<JsonPlaceHolder> datalist = [];
-    if (response.statusCode == 200) {
-      //final jsonok = "[" + response.body + "]";
-      //List notesjson = json.decode(response.body);
-      var notesjson1 = jsonDecode(response.body.toString());
-      for (Map<String, dynamic> i in notesjson1) {
-        datalist.add(JsonPlaceHolder.fromJson(i));
-      }
-    }
-    return datalist;
-  }
+  List<Attributes> newlist = [];
 
   @override
   Widget build(BuildContext context) {
-    fetchData().then((value) {
-      setState(() {
-        newlist.addAll(value);
-      });
-    });
     return Scaffold(
       appBar: AppBar(
-        title: Text("GetPost App"),
+        title: const Text("GetPost App"),
       ),
-      body: ListView.builder(
-        itemBuilder: (BuildContext context, ind) {
-          return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "NAME :" + newlist[ind].id.toString(),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                ServiceApi().fetchData().then((value) {
+                  setState(() {
+                    newlist.addAll(value);
+                  });
+                });
+              },
+              child: const Text("Get Data")),
+          ListView.builder(
+            itemBuilder: (BuildContext context, ind) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "NAME :${newlist[ind].name}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Text("EMAIL :${newlist[ind].email}",
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text(
+                        "ADDRESS :${newlist[ind].address}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "NUMBER :${newlist[ind].number}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  Text("EMAIL :" + newlist[ind].title,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          );
-        },
-        shrinkWrap: true,
-        itemCount: newlist.length,
+                ),
+              );
+            },
+            shrinkWrap: true,
+            itemCount: newlist.length,
+          ),
+        ],
       ),
     );
   }

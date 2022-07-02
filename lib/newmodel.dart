@@ -2,7 +2,6 @@
 //
 //     final applicationNew = applicationNewFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 ApplicationNew applicationNewFromJson(String str) =>
